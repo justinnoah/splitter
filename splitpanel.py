@@ -5,8 +5,7 @@ class SplitPanel(wx.Panel):
     predefined = sorted(["Cardio", "H&P", "Consult", "OP Report", "Discharge", "Clinic", "ED Report"])
 
     def __init__(self, parent, id):
-        wx.Panel.__init__(self, parent.panel, id)
-        parent = parent
+        wx.Panel.__init__(self, parent, id)
 
         # category_row, split_entry
         self.outer = wx.BoxSizer(wx.VERTICAL)
@@ -22,38 +21,33 @@ class SplitPanel(wx.Panel):
         self.out_text = wx.StaticText(self, label=" Output: ")
         self.ent_path = wx.TextCtrl(self)
         self.btn_browse = wx.Button(self, label="Browse...")
-        self.btn_Add = wx.Button(self, wx.ID_ADD)
 
         # Add items to category_row
         self.category_row.Add(self.cmb_prefix, proportion=0)
         self.category_row.Add(self.out_text, proportion=0, flag=wx.ALIGN_CENTER_VERTICAL)
         self.category_row.Add(self.ent_path, proportion=5)
         self.category_row.Add(self.btn_browse, proportion=0)
-        self.category_row.Add(self.btn_Add, proportion=0)
 
         # Split Rules Row contents
         self.lbl_split = wx.StaticText(self, label="  Split Ranges: ")
         self.ent_split_rules = wx.TextCtrl(self)
-        self.btn_Remove = wx.Button(self, wx.ID_REMOVE)
-        self.btn_Remove.Disable()
-
+        self.btn_Clear = wx.Button(self, wx.ID_CLEAR)
 
         # Add items to rules_row
         self.rules_row.Add(self.lbl_split, proportion=0, flag=wx.ALIGN_CENTER_VERTICAL)
         self.rules_row.Add(self.ent_split_rules, proportion=5)
-        self.rules_row.Add(self.btn_Remove, proportion=0)
+        self.rules_row.Add(self.btn_Clear, proportion=0)
 
         # Add items to outer
         self.outer.Add(self.category_row, proportion=0, flag=wx.GROW)
         self.outer.Add(self.rules_row, proportion=0, flag=wx.GROW)
 
         # Setup bindings
-        parent.Bind(wx.EVT_BUTTON, parent.OnAdd, self.btn_Add)
-        parent.Bind(wx.EVT_BUTTON, parent.OnRemove, self.btn_Remove)
+        self.Bind(wx.EVT_BUTTON, self.OnClear, self.btn_Clear)
 
         # Finish up
         self.SetSizer(self.outer)
         self.Show()
-        
-    def enable(self):
-        self.btn_Remove.Enable()
+
+    def OnClear(self, event):
+        self.ent_split_rules.Clear()

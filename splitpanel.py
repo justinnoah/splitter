@@ -35,6 +35,7 @@ class SplitPanel(wx.Panel):
         self.lbl_split = wx.StaticText(self, label="Split Ranges: ")
         self.ent_split_rules = wx.TextCtrl(self)
         self.btn_Remove = wx.Button(self, wx.ID_REMOVE)
+        self.btn_Remove.Disable()
 
 
         # Add items to rules_row
@@ -48,7 +49,11 @@ class SplitPanel(wx.Panel):
 
         # Setup bindings
         parent.Bind(wx.EVT_BUTTON, parent.OnAdd, self.btn_Add)
+        parent.Bind(wx.EVT_BUTTON, parent.OnRemove, self.btn_Remove)
 
         # Finish up
         self.SetSizer(self.outer)
         self.Show()
+        
+    def enable(self):
+        self.btn_Remove.Enable()

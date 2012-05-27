@@ -8,7 +8,7 @@ class PDFSplit(wx.Frame):
     splitters = []
 
     def __init__(self, parent):
-        wx.Frame.__init__(self, parent, title=self.TITLE, size=(700,175))
+        wx.Frame.__init__(self, parent, title=self.TITLE, size=(700,155))
         self.panel = wx.Panel(self)
         self.shell_grid = wx.BoxSizer(wx.VERTICAL)
         self.shell_grid.Add((10,10))
@@ -59,13 +59,12 @@ class PDFSplit(wx.Frame):
         pdf_box.Add(pdf_in, proportion=0, flag=wx.GROW)
         self.shell_grid.Add(pdf_box, proportion=0, flag=wx.GROW)
 
-        # Here is the first row of PDF splitting rules.
-        self.splitters.append(SplitPanel(self, wx.ID_ANY))
-        self.shell_grid.Add(self.splitters[0], proportion=0, flag=wx.GROW)
-
         # (Temporary) Button to initiate splitting.
         self.btn_split = wx.Button(self.panel, label="Split", id=32)
         self.shell_grid.Add(self.btn_split, proportion=0, flag=wx.GROW)
+        
+        # Give one
+        self.OnAdd(None)
 
     def OnExit(self):
         self.Close(True)
@@ -75,8 +74,24 @@ class PDFSplit(wx.Frame):
         t = SplitPanel(self, wx.ID_ANY)
         self.shell_grid.Insert(len(self.shell_grid.Children) - 1, t,
             proportion=0, flag=wx.GROW)
+        if len(self.shell_grid.GetChildren()) > 4:
+            t.enable()
         self.panel.Layout()
-        self.SetSize((win_size.x, win_size.y + self.splitters[-1].GetSize().y))
+        
+        # t.GetSize() must be called after self.panel.Layout() to get
+        # the correct size.
+        self.sHeight = t.GetSize().y
+        self.SetSize((win_size.x, win_size.y + self.sHeight))
+    
+    def OnRemove(self, event):
+        # With Remove, we want to remove one of the splitter sections
+        # and shrink the window height.
+        win_size = self.GetSize()
+        childs = len(self.shell_grid.GetChildren())
+        if childs > 4:
+            event.GetEventObject().GetParent().Destroy()
+            self.panel.Layout()
+            self.SetSize((win_size.x, win_size.y - self.sHeight))
 
 pdfs = wx.App(False)
 frame = PDFSplit(None)

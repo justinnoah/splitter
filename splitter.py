@@ -1,15 +1,14 @@
 import wx
 from splitpanel import SplitPanel
 
-# With wxPython (maybe just wxWidgets in general) it's all about the FLOW.
-
 class PDFSplit(wx.Frame):
 
     VERSION = "1.0.3beta"
     TITLE = "PDFSplit " + VERSION
+    splitters = []
 
     def __init__(self, parent):
-        wx.Frame.__init__(self, parent, title=self.TITLE, size=(700,180))
+        wx.Frame.__init__(self, parent, title=self.TITLE, size=(700,175))
         self.panel = wx.Panel(self)
         self.shell_grid = wx.BoxSizer(wx.VERTICAL)
         self.shell_grid.Add((10,10))
@@ -61,14 +60,23 @@ class PDFSplit(wx.Frame):
         self.shell_grid.Add(pdf_box, proportion=0, flag=wx.GROW)
 
         # Here is the first row of PDF splitting rules.
-        self.first = SplitPanel(self.panel, wx.ID_ANY)
-        self.shell_grid.Add(self.first, proportion=0, flag=wx.GROW)
+        self.splitters.append(SplitPanel(self, wx.ID_ANY))
+        self.shell_grid.Add(self.splitters[0], proportion=0, flag=wx.GROW)
 
         # (Temporary) Button to initiate splitting.
-        self.shell_grid.Add(wx.Button(self.panel, label="Split"), proportion=0, flag=wx.GROW)
+        self.btn_split = wx.Button(self.panel, label="Split", id=32)
+        self.shell_grid.Add(self.btn_split, proportion=0, flag=wx.GROW)
 
     def OnExit(self):
         self.Close(True)
+
+    def OnAdd(self, event):
+        win_size = self.GetSize()
+        t = SplitPanel(self, wx.ID_ANY)
+        self.shell_grid.Insert(len(self.shell_grid.Children) - 1, t,
+            proportion=0, flag=wx.GROW)
+        self.panel.Layout()
+        self.SetSize((win_size.x, win_size.y + self.splitters[-1].GetSize().y))
 
 pdfs = wx.App(False)
 frame = PDFSplit(None)

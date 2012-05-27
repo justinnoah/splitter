@@ -49,7 +49,7 @@ class PDFSplit(wx.Frame):
 
         # Input PDF layout (yes, it's a lot...)
         self.ent_pdf_in = wx.TextCtrl(self.panel)
-        lbl_pdf_in = wx.StaticText(self.panel, label="PDF: ")
+        lbl_pdf_in = wx.StaticText(self.panel, label="  PDF: ")
         self.btn_pdf_in = wx.Button(self.panel, label="Browse")
         pdf_in.Add(lbl_pdf_in, proportion=0, flag=wx.ALIGN_CENTER_VERTICAL)
         pdf_in.Add(self.ent_pdf_in, proportion=1, flag=wx.GROW)

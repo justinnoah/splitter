@@ -19,7 +19,7 @@ class SplitPanel(wx.Panel):
         # category_row contents
         self.cmb_prefix = wx.ComboBox(self, choices=self.predefined)
         self.cmb_prefix.SetValue(self.predefined[0])
-        self.out_text = wx.StaticText(self, label="Output: ")
+        self.out_text = wx.StaticText(self, label=" Output: ")
         self.ent_path = wx.TextCtrl(self)
         self.btn_browse = wx.Button(self, label="Browse...")
         self.btn_Add = wx.Button(self, wx.ID_ADD)
@@ -32,7 +32,7 @@ class SplitPanel(wx.Panel):
         self.category_row.Add(self.btn_Add, proportion=0)
 
         # Split Rules Row contents
-        self.lbl_split = wx.StaticText(self, label="Split Ranges: ")
+        self.lbl_split = wx.StaticText(self, label="  Split Ranges: ")
         self.ent_split_rules = wx.TextCtrl(self)
         self.btn_Remove = wx.Button(self, wx.ID_REMOVE)
         self.btn_Remove.Disable()

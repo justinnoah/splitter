@@ -9,9 +9,10 @@ class PDFSplit(wx.Frame):
     TITLE = "PDFSplit " + VERSION
 
     def __init__(self, parent):
-        wx.Frame.__init__(self, parent, title=self.TITLE, size=(700,175))
+        wx.Frame.__init__(self, parent, title=self.TITLE, size=(700,180))
         self.panel = wx.Panel(self)
         self.shell_grid = wx.BoxSizer(wx.VERTICAL)
+        self.shell_grid.Add((10,10))
 
         # File Menu
         filemenu = wx.Menu()
@@ -48,12 +49,12 @@ class PDFSplit(wx.Frame):
         pdf_in = wx.BoxSizer(wx.HORIZONTAL)
 
         # Input PDF layout (yes, it's a lot...)
-        lbl_pdf_in = wx.StaticText(self.panel, label="PDF: ")
         self.ent_pdf_in = wx.TextCtrl(self.panel)
+        lbl_pdf_in = wx.StaticText(self.panel, label="PDF: ")
         self.btn_pdf_in = wx.Button(self.panel, label="Browse")
-        pdf_in.Add(lbl_pdf_in, proportion=0, flag=wx.GROW)
+        pdf_in.Add(lbl_pdf_in, proportion=0, flag=wx.ALIGN_CENTER_VERTICAL)
         pdf_in.Add(self.ent_pdf_in, proportion=1, flag=wx.GROW)
-        pdf_in.Add(self.btn_pdf_in, proportion=0, flag=wx.GROW)
+        pdf_in.Add(self.btn_pdf_in, proportion=0)
 
         # Putting the path details together.
         pdf_box.Add(pdf_in, proportion=0, flag=wx.GROW)

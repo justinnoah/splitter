@@ -17,12 +17,15 @@ class SplitPanel(wx.Panel):
         
         # category_row contents
         self.cmb_prefix = wx.ComboBox(self, choices=self.predefined)
+        self.cmb_prefix.SetValue(self.predefined[0])
+        self.out_text = wx.StaticText(self, label="Output: ")
         self.ent_path = wx.TextCtrl(self)
         self.btn_browse = wx.Button(self, label="Browse...")
         self.btn_Add = wx.Button(self, wx.ID_ADD)
         
         # Add items to category_row
         self.category_row.Add(self.cmb_prefix, proportion=0)
+        self.category_row.Add(self.out_text, proportion=0)
         self.category_row.Add(self.ent_path, proportion=5)
         self.category_row.Add(self.btn_browse, proportion=0)
         self.category_row.Add(self.btn_Add, proportion=0)

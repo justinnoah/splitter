@@ -1,10 +1,13 @@
-﻿import wx
+﻿import os
+
+import wx
 
 class SplitPanel(wx.Panel):
 
     predefined = sorted(["Cardio", "H&P", "Consult", "OP Report", "Discharge", "Clinic", "ED Report"])
 
     def __init__(self, parent, id):
+        # THIS NEEDS TO BE CLEANED!
         wx.Panel.__init__(self, parent, id)
 
         # category_row, split_entry
@@ -52,10 +55,30 @@ class SplitPanel(wx.Panel):
         self.Show()
 
     def OnClear(self, event):
+        self.ent_path.SetBackgroundColour("White")
+        self.ent_path.Clear()
+        self.ent_path.Refresh()
+        self.ent_split_rules.SetBackgroundColour("White")
         self.ent_split_rules.Clear()
+        self.ent_split_rules.Refresh()
 
     def ValidateRange(self, event):
         event.Skip()
 
     def ValidatePath(self, event):
+        # Simplify some typing with 'text'
+        text = event.GetEventObject()
+
+        # For no text in the Outpath field, the background color
+        # should be white. If the path doesn't exist, pink, or if the path
+        # does exist, the 'pink' of green (light green).
+        if not text.GetValue():
+            text.SetBackgroundColour("White")
+        elif os.path.isdir(os.path.join(text.GetValue())):
+            text.SetBackgroundColour((192,255,203))
+            print "Valid"
+        else:
+            text.SetBackgroundColour((255,192,203))
+            print "Invalid"
+        text.Refresh()
         event.Skip()

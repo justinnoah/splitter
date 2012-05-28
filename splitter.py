@@ -15,15 +15,15 @@ class PDFSplit(wx.Frame):
 
         # File Menu
         filemenu = wx.Menu()
-        menuAdd = filemenu.Append(id=wx.ID_ANY, text="&Add Section\tCTRL-A")
-        self.menuRemove = filemenu.Append(id=wx.ID_ANY, text="&Remove Section\tCTRL-R")
+        self.menuAdd = filemenu.Append(id=wx.ID_ANY, text="&Add Section\tALT-A")
+        self.menuRemove = filemenu.Append(id=wx.ID_ANY, text="&Remove Section\tALT-D")
         self.menuRemove.Enable(False)
         filemenu.AppendSeparator()
         menuExit = filemenu.Append(wx.ID_EXIT, "E&xit\tALT-F4", "Close " + self.TITLE)
 
         # Help Menu
         helpmenu = wx.Menu()
-        helpmenu.Append(-1, "Manual", "Coming Soon!")
+        helpmenu.Append(-1, "About", "Coming Soon!")
         helpmenu.AppendSeparator()
         helpmenu.Append(-1, "&License\tCTRL-L", "3 Clause BSD")
 
@@ -35,13 +35,25 @@ class PDFSplit(wx.Frame):
 
         # Bind Menu Events
         self.Bind(wx.EVT_MENU, self.OnExit, menuExit)
-        self.Bind(wx.EVT_MENU, self.OnAdd, menuAdd)
+        self.Bind(wx.EVT_MENU, self.OnAdd, self.menuAdd)
         self.Bind(wx.EVT_MENU, self.OnRemove, self.menuRemove)
 
+        # Setup the accelerators
+        self.setup_accels()
+
+        # Finish up
         self.setup_layout()
         self.panel.SetSizer(self.shell_grid)
         self.panel.Layout()
         self.Show()
+
+    def setup_accels(self):
+        self.accel_table = wx.AcceleratorTable([
+            (wx.ACCEL_ALT, ord('A'), self.menuAdd.GetId()),
+            (wx.ACCEL_ALT, ord('D'), self.menuRemove.GetId()),
+        ])
+        self.SetAcceleratorTable(self.accel_table)
+
 
     def setup_layout(self):
         # For the default layout I would like to have the path of the PDF

@@ -1,5 +1,5 @@
 ﻿import os
-
+import re
 import wx
 
 class SplitPanel(wx.Panel):
@@ -55,6 +55,8 @@ class SplitPanel(wx.Panel):
         self.Show()
 
     def OnClear(self, event):
+        # Reset background color to white and clear the text of
+        # the text fields.
         self.ent_path.SetBackgroundColour("White")
         self.ent_path.Clear()
         self.ent_path.Refresh()
@@ -63,7 +65,55 @@ class SplitPanel(wx.Panel):
         self.ent_split_rules.Refresh()
 
     def ValidateRange(self, event):
-        event.Skip()
+        text_field = event.GetEventObject()
+        text = text_field.GetValue()
+        result = False
+
+        # Change all , to . for splitting simplification
+        text = text.replace(',','.')
+        text = text.strip('.')
+        sections = text.split('.')
+
+        # Need to match any number or range of numbers separated by a -.
+        pattern = "(\d+-\d+$|\d+$)"
+
+        # Now to check each number or range individually, but break early and
+        # color pink if invalid input is given.
+        for t in sections:
+
+            m = re.match(pattern, t)
+
+            # If we have a match, let's see if it is a number or range.
+            if m:
+                # Checking for a range
+                if '-' in t:
+                    # Split at the -
+                    numbers = t.split('-')
+                    # and check if we have an increasing range.
+                    if int(numbers[1]) - int(numbers[0]) >= 0:
+                        result = True
+                    # break if not
+                    else:
+                        result = False
+                        break
+                # If not a range, then it is a single integer according
+                # to the regex and we want a green light.
+                else:
+                    result = True
+            # A valid digit or possible range was not found, lets flag the user
+            else:
+                result = False
+                break
+
+        if not text:
+            text_field.SetBackgroundColour("White")
+        else:
+            if result:
+                text_field.SetBackgroundColour((192,255,203))
+            elif not result:
+                text_field.SetBackgroundColour((255,192,203))
+
+        text_field.Refresh()
 
     def ValidatePath(self, event):
         # Simplify some typing with 'text'
@@ -81,4 +131,3 @@ class SplitPanel(wx.Panel):
             text.SetBackgroundColour((255,192,203))
             print "Invalid"
         text.Refresh()
-        event.Skip()

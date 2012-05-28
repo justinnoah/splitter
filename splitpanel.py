@@ -18,7 +18,7 @@ class SplitPanel(wx.Panel):
         # category_row contents
         self.cmb_prefix = wx.ComboBox(self, choices=self.predefined)
         self.cmb_prefix.SetValue(self.predefined[0])
-        self.out_text = wx.StaticText(self, label=" Output: ")
+        self.out_text = wx.StaticText(self, label=" Output Path: ")
         self.ent_path = wx.TextCtrl(self)
         self.btn_browse = wx.Button(self, label="Browse...")
 
@@ -44,6 +44,8 @@ class SplitPanel(wx.Panel):
 
         # Setup bindings
         self.Bind(wx.EVT_BUTTON, self.OnClear, self.btn_Clear)
+        self.Bind(wx.EVT_TEXT, self.ValidateRange)
+        self.Bind(wx.EVT_TEXT, self.ValidatePath, self.ent_path)
 
         # Finish up
         self.SetSizer(self.outer)
@@ -51,3 +53,9 @@ class SplitPanel(wx.Panel):
 
     def OnClear(self, event):
         self.ent_split_rules.Clear()
+
+    def ValidateRange(self, event):
+        event.Skip()
+
+    def ValidatePath(self, event):
+        event.Skip()

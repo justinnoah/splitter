@@ -47,7 +47,7 @@ class SplitPanel(wx.Panel):
 
         # Setup bindings
         self.Bind(wx.EVT_BUTTON, self.OnClear, self.btn_Clear)
-        self.Bind(wx.EVT_TEXT, self.ValidateRange)
+        self.Bind(wx.EVT_TEXT, self.ValidateRange, self.ent_split_rules)
         self.Bind(wx.EVT_TEXT, self.ValidatePath, self.ent_path)
 
         # Finish up
@@ -114,6 +114,7 @@ class SplitPanel(wx.Panel):
                 text_field.SetBackgroundColour((255,192,203))
 
         text_field.Refresh()
+        event.Skip()
 
     def ValidatePath(self, event):
         # Simplify some typing with 'text'
@@ -131,3 +132,4 @@ class SplitPanel(wx.Panel):
             text.SetBackgroundColour((255,192,203))
             print "Invalid"
         text.Refresh()
+        event.Skip()

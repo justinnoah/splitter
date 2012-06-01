@@ -47,6 +47,7 @@ class SplitPanel(wx.Panel):
 
         # Setup bindings
         self.Bind(wx.EVT_BUTTON, self.OnClear, self.btn_Clear)
+        self.Bind(wx.EVT_BUTTON, self.OnBrowse, self.btn_browse)
         self.Bind(wx.EVT_TEXT, self.ValidateRange, self.ent_split_rules)
         self.Bind(wx.EVT_TEXT, self.ValidatePath, self.ent_path)
 
@@ -132,4 +133,13 @@ class SplitPanel(wx.Panel):
             text.SetBackgroundColour((255,192,203))
             print "Invalid"
         text.Refresh()
+        event.Skip()
+
+    def OnBrowse(self, event):
+        dlg = wx.DirDialog(self, message=self.cmb_prefix.GetValue() + " Output Folder", defaultPath="")
+        if dlg.ShowModal() == wx.ID_OK:
+            self.ent_path.Clear()
+            path = os.path.join(dlg.GetPath())
+            self.ent_path.AppendText(path)
+        dlg.Destroy()
         event.Skip()

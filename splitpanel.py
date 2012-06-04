@@ -1,5 +1,6 @@
 ﻿import os
 import re
+
 import wx
 
 class SplitPanel(wx.Panel):
@@ -128,14 +129,13 @@ class SplitPanel(wx.Panel):
             text.SetBackgroundColour("White")
         elif os.path.isdir(os.path.join(text.GetValue())):
             text.SetBackgroundColour((192,255,203))
-            print "Valid"
         else:
             text.SetBackgroundColour((255,192,203))
-            print "Invalid"
         text.Refresh()
         event.Skip()
 
     def OnBrowse(self, event):
+        # Openning the PDF for manipulation
         dlg = wx.DirDialog(self, message=self.cmb_prefix.GetValue() + " Output Folder", defaultPath="")
         if dlg.ShowModal() == wx.ID_OK:
             self.ent_path.Clear()
@@ -143,3 +143,7 @@ class SplitPanel(wx.Panel):
             self.ent_path.AppendText(path)
         dlg.Destroy()
         event.Skip()
+
+if __name__ == '__main__':
+    print "Not a standalone module"
+    exit(0)

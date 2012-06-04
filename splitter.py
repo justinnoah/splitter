@@ -1,16 +1,24 @@
 import os
 import wx
+
+from pyPdf import PdfFileReader
 from splitpanel import SplitPanel
+from splitpdf import Actuator
 
 class PDFSplit(wx.Frame):
 
     VERSION = "1.0.4beta"
     TITLE = "PDFSplit " + VERSION
     splitters = 0
+    SPLITTER_START_POS = 2
 
     def __init__(self, parent):
-        self.the_pdf = ""
-        wx.Frame.__init__(self, parent, title=self.TITLE, size=(700,155))
+        self.le_pdf = ""
+        self.frame = wx.Frame.__init__(self, parent,
+            title=self.TITLE,
+            size=(700,155),
+            style=wx.MINIMIZE_BOX|wx.RESIZE_BORDER|wx.SYSTEM_MENU|wx.CAPTION|
+                wx.CLOSE_BOX|wx.CLIP_CHILDREN)
         self.panel = wx.Panel(self)
         self.shell_grid = wx.BoxSizer(wx.VERTICAL)
         self.shell_grid.Add((10,10))
@@ -37,14 +45,15 @@ class PDFSplit(wx.Frame):
 
         # Do the layout
         self.setup_layout()
-        
+
         # Bind Menu Events
         self.Bind(wx.EVT_MENU, self.OnExit, menuExit)
         self.Bind(wx.EVT_MENU, self.OnAdd, self.menuAdd)
         self.Bind(wx.EVT_MENU, self.OnRemove, self.menuRemove)
-        
+
         # Bind Button Events
-        self.Bind(wx.EVT_BUTTON, self.OnBrowseOutput, self.btn_pdf_in)
+        self.Bind(wx.EVT_BUTTON, self.OnBrowseInput, self.btn_pdf_in)
+        self.Bind(wx.EVT_BUTTON, self.OnSplit, self.btn_split)
 
         # Setup the accelerators
         self.setup_accels()
@@ -91,8 +100,8 @@ class PDFSplit(wx.Frame):
         self.OnAdd(None)
 
     def OnExit(self, event):
-        if self.the_pdf:
-            self.the_pdf.close()
+        if self.le_pdf:
+            self.le_pdf.close()
         self.Close(True)
 
     def OnAdd(self, event):
@@ -132,20 +141,35 @@ class PDFSplit(wx.Frame):
         if self.splitters <= 1:
             self.menuRemove.Enable(False)
 
-            
-    def OnBrowseOutput(self, event):
+
+    def OnBrowseInput(self, event):
         # If we have an open file handle, let's close it
-        if self.the_pdf:
-            self.the_pdf.close()
+        if self.le_pdf:
+            self.le_pdf.close()
 
         # Now present the user with a file dialog to chose the pdf to split
-        dlg = wx.FileDialog(self, message="Open PDF", defaultDir="", defaultFile="", wildcard="PDF files (*.pdf)|*.pdf", style=wx.FD_OPEN)
+        dlg = wx.FileDialog(self, message="Open PDF", defaultDir="",
+            defaultFile="", wildcard="PDF files (*.pdf)|*.pdf", style=wx.FD_OPEN)
         if dlg.ShowModal() == wx.ID_OK:
             self.ent_pdf_in.Clear()
             path = os.path.join(dlg.GetPath())
             self.ent_pdf_in.AppendText(path)
-            self.the_pdf = open(path)
+            self.le_pdf = open(path)
         dlg.Destroy()
+
+    def OnSplit(self, event):
+        if self.le_pdf:
+            actuator = Actuator(self)
+            actuator.Show()
+            actuator.process()
+
+    def get_splitter(self, num):
+        """
+        Returns the splitpanel for the splitter number given. Returns None if
+        an invalid number is given.
+        """
+        n = self.SPLITTER_START_POS + num
+        return self.shell_grid.GetItem(n).GetWindow()
 
 pdfs = wx.App(False)
 frame = PDFSplit(None)

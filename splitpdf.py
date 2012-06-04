@@ -120,10 +120,8 @@ class Actuator(wx.Frame):
             if k >= self.parent.SPLITTER_START_POS and k < len(self.parent.shell_grid.GetChildren())-1:
                 window = v.GetWindow()
                 # Check for whites
-                if (window.ent_path.GetBackgroundColour() <> (255,255,255) and
-                   window.ent_split_rules.GetBackgroundColour() <> (255,255,255)):
-                        self.le_splitters.append(window)
-                else:
+                if (window.ent_path.GetValue() == "" or
+                    window.ent_split_rules.GetValue() == ""):
                     # Temp hack, because I can.
                     self.hb_analyze.GetItem(2).GetWindow().SetLabel("FAILED!")
                     self.hb_analyze.GetItem(2).GetWindow().SetForegroundColour("Red")
@@ -131,6 +129,7 @@ class Actuator(wx.Frame):
                     wx.MessageBox("Please fill out all fields before splitting.",
                         "info", wx.OK|wx.ICON_INFORMATION)
                     return False
+                self.le_splitters.append(window)
         return True
 
     def verify_input(self):

@@ -100,8 +100,6 @@ class PDFSplit(wx.Frame):
         self.OnAdd(None)
 
     def OnExit(self, event):
-        if self.le_pdf:
-            self.le_pdf.close()
         self.Close(True)
 
     def OnAdd(self, event):
@@ -143,10 +141,6 @@ class PDFSplit(wx.Frame):
 
 
     def OnBrowseInput(self, event):
-        # If we have an open file handle, let's close it
-        if self.le_pdf:
-            self.le_pdf.close()
-
         # Now present the user with a file dialog to chose the pdf to split
         dlg = wx.FileDialog(self, message="Open PDF", defaultDir="",
             defaultFile="", wildcard="PDF files (*.pdf)|*.pdf", style=wx.FD_OPEN)
@@ -154,7 +148,9 @@ class PDFSplit(wx.Frame):
             self.ent_pdf_in.Clear()
             path = os.path.join(dlg.GetPath())
             self.ent_pdf_in.AppendText(path)
-            self.le_pdf = PdfFileReader(file(path, 'rb'))
+            self.le_pdf = PdfFileReader(file(path, "rb"))
+            self.le_pdf.getNumPages()
+            self.ent_pdf_in.SetBackgroundColour((192,255,203))
         dlg.Destroy()
 
     def OnSplit(self, event):

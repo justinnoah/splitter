@@ -42,23 +42,21 @@ class WorkerWindow(wx.Frame):
         self.vbox = wx.BoxSizer(wx.VERTICAL)
         self.vbox.Add((0,10))
 
-        # There will be several processes happening:
-
-        # 1) Analyze input
-        self.hb_analyze = wx.BoxSizer(wx.HORIZONTAL)
-        self.hb_analyze.Add(wx.StaticText(self.panel, label=unichr(ord(u'\u27A4')), style=wx.ALIGN_RIGHT), proportion=1)
-        self.hb_analyze.Add(wx.StaticText(self.panel, label="Analyzing input...", style=wx.ALIGN_LEFT), proportion=3)
-        self.hb_analyze.Add(wx.StaticText(self.panel, label="", style=wx.ALIGN_LEFT), proportion=3)
-        self.vbox.Add(self.hb_analyze, proportion=0, flag=wx.GROW)
-        self.hb_analyze.ShowItems(False)
-
-        # 2) Verify input
+        # 1) Verify input
         self.hb_verify = wx.BoxSizer(wx.HORIZONTAL)
         self.hb_verify.Add(wx.StaticText(self.panel, label=unichr(ord(u'\u27A4')), style=wx.ALIGN_RIGHT), proportion=1)
         self.hb_verify.Add(wx.StaticText(self.panel, label="Verifying input...", style=wx.ALIGN_LEFT), proportion=3)
         self.hb_verify.Add(wx.StaticText(self.panel, label="", style=wx.ALIGN_LEFT), proportion=3)
         self.vbox.Add(self.hb_verify, proportion=0, flag=wx.GROW)
         self.hb_verify.ShowItems(False)
+
+        # 2) Analyze input
+        self.hb_analyze = wx.BoxSizer(wx.HORIZONTAL)
+        self.hb_analyze.Add(wx.StaticText(self.panel, label=unichr(ord(u'\u27A4')), style=wx.ALIGN_RIGHT), proportion=1)
+        self.hb_analyze.Add(wx.StaticText(self.panel, label="Analyzing input...", style=wx.ALIGN_LEFT), proportion=3)
+        self.hb_analyze.Add(wx.StaticText(self.panel, label="", style=wx.ALIGN_LEFT), proportion=3)
+        self.vbox.Add(self.hb_analyze, proportion=0, flag=wx.GROW)
+        self.hb_analyze.ShowItems(False)
 
         """
         for new_row in range(0, self.rows):
@@ -83,15 +81,26 @@ class WorkerWindow(wx.Frame):
 
     def process(self):
         """
-        Analyze
         Verify
+        Analyze
         Generate
         Done
         """
 
         # Begin by analyzing (or creating a list of splitpanels to work with
-        self.hb_analyze.ShowItems(True)
+        self.hb_verify.ShowItems(True)
         # Redraw
+        self.panel.Layout()
+
+        if not self.verify_input():
+            self.Destroy()
+            return (False, "Failed to Verify")
+        else:
+            self.helper_gray(self.hb_verify)
+            self.hb_verify.GetItem(2).GetWindow().SetLabel("Success!")
+
+        # Redraw
+        self.hb_analyze.ShowItems(True)
         self.panel.Layout()
 
         if not self.analyze_input():
@@ -102,16 +111,11 @@ class WorkerWindow(wx.Frame):
             # 2: "Success!"
             self.helper_gray(self.hb_analyze)
             self.hb_analyze.GetItem(2).GetWindow().SetLabel("Success!")
-            self.hb_verify.ShowItems(True)
 
         # Redraw
         self.panel.Layout()
 
-        if not self.verify_input():
-            self.Destroy()
-            return (False, "Failed to Verify")
-
-    def analyze_input(self):
+    def verify_input(self):
         """
         Generate a list of the splitpanels for ease of use
         """
@@ -122,8 +126,8 @@ class WorkerWindow(wx.Frame):
                 if (window.ent_path.GetValue() == "" or
                     window.ent_split_rules.GetValue() == ""):
                     # Temp hack, because I can.
-                    self.hb_analyze.GetItem(2).GetWindow().SetLabel("FAILED!")
-                    self.hb_analyze.GetItem(2).GetWindow().SetForegroundColour("Red")
+                    self.hb_verify.GetItem(2).GetWindow().SetLabel("FAILED!")
+                    self.hb_verify.GetItem(2).GetWindow().SetForegroundColour("Red")
                     self.panel.Layout()
                     wx.MessageBox("Please fill out all fields before splitting.",
                         "info", wx.OK|wx.ICON_INFORMATION)
@@ -131,17 +135,17 @@ class WorkerWindow(wx.Frame):
                 self.le_splitters.append(window)
         return True
 
-    def verify_input(self):
+    def analyze_input(self):
         # Should always have analyzed before verify
         if not self.le_splitters:
-            wx.MessageBox("Analyze should be ran first!", "Error", wx.OK|wx.ICON_ERROR)
+            wx.MessageBox("Verify should be ran first!", "Error", wx.OK|wx.ICON_ERROR)
             return False
-        
+
         for section in self.le_splitters:
             # Verify output path
             if not os.path.isdir(os.path.join(section.ent_path.GetValue())):
                 return False
-            
+
             if not section.ent_split_rules.GetBackgroundColour() <> (255,192,203):
                 return False
 

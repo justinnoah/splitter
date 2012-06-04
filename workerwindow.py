@@ -6,9 +6,10 @@ from pyPdf import PdfFileWriter, PdfFileReader
 # This class actually does the verification of splitting parameters and the
 # writing of the new PDF files.
 
-class Actuator(wx.Frame):
+class WorkerWindow(wx.Frame):
     """
-    Actuator: actuates
+    WorkerWindow: the window that lets the user know what work is being done
+                  and does all the pdf splitting and so forth.
 
     -----------------------------------------
     |                                       |
@@ -19,8 +20,6 @@ class Actuator(wx.Frame):
     |                                       |
     |              |DONE|                   |
     -----------------------------------------
-
-
     """
 
     def __init__(self, parent):

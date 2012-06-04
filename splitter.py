@@ -3,7 +3,7 @@ import wx
 
 from pyPdf import PdfFileReader
 from splitpanel import SplitPanel
-from splitpdf import Actuator
+from workerwindow import WorkerWindow
 
 class PDFSplit(wx.Frame):
 
@@ -159,9 +159,9 @@ class PDFSplit(wx.Frame):
 
     def OnSplit(self, event):
         if self.le_pdf:
-            actuator = Actuator(self)
-            actuator.Show()
-            actuator.process()
+            worker = WorkerWindow(self)
+            worker.Show()
+            worker.process()
 
 pdfs = wx.App(False)
 frame = PDFSplit(None)

@@ -1,4 +1,4 @@
-﻿import os
+import os
 import re
 
 import wx
@@ -59,10 +59,10 @@ class SplitPanel(wx.Panel):
     def OnClear(self, event):
         # Reset background color to white and clear the text of
         # the text fields.
-        self.ent_path.SetBackgroundColour("White")
+        self.ent_path.SetBackgroundColour(wx.NullColour)
         self.ent_path.Clear()
         self.ent_path.Refresh()
-        self.ent_split_rules.SetBackgroundColour("White")
+        self.ent_split_rules.SetBackgroundColour(wx.NullColour)
         self.ent_split_rules.Clear()
         self.ent_split_rules.Refresh()
 
@@ -108,7 +108,7 @@ class SplitPanel(wx.Panel):
                 break
 
         if not text:
-            text_field.SetBackgroundColour("White")
+            text_field.SetBackgroundColour(wx.NullColour)
         else:
             if result:
                 text_field.SetBackgroundColour((192,255,203))
@@ -126,7 +126,7 @@ class SplitPanel(wx.Panel):
         # should be white. If the path doesn't exist, pink, or if the path
         # does exist, the 'pink' of green (light green).
         if not text.GetValue():
-            text.SetBackgroundColour("White")
+            text.SetBackgroundColour(wx.NullColour)
         elif os.path.isdir(os.path.join(text.GetValue())):
             text.SetBackgroundColour((192,255,203))
         else:

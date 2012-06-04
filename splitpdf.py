@@ -1,4 +1,4 @@
-﻿import os
+import os
 
 import wx
 from pyPdf import PdfFileWriter, PdfFileReader

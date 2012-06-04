@@ -141,12 +141,14 @@ class WorkerWindow(wx.Frame):
             wx.MessageBox("Verify should be ran first!", "Error", wx.OK|wx.ICON_ERROR)
             return False
 
-        for section in self.le_splitters:
+        for k,section in enumerate(self.le_splitters):
             # Verify output path
             if not os.path.isdir(os.path.join(section.ent_path.GetValue())):
+                wx.MessageBox(section.ent_path.GetValue() + " is not a valid path!", "Error", wx.OK|wx.ICON_ERROR)
                 return False
 
             if not section.ent_split_rules.GetBackgroundColour() <> (255,192,203):
+                wx.MessageBox("Your split rules \"" + section.ent_split_rules.GetValue() + "\" are not valid!", "Error", wx.OK|wx.ICON_ERROR)
                 return False
 
         return True

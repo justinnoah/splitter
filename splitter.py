@@ -154,7 +154,7 @@ class PDFSplit(wx.Frame):
             self.ent_pdf_in.Clear()
             path = os.path.join(dlg.GetPath())
             self.ent_pdf_in.AppendText(path)
-            self.le_pdf = open(path)
+            self.le_pdf = PdfFileReader(file(path, 'rb'))
         dlg.Destroy()
 
     def OnSplit(self, event):
@@ -162,6 +162,9 @@ class PDFSplit(wx.Frame):
             worker = WorkerWindow(self)
             worker.Show()
             worker.process()
+        else:
+            wx.MessageBox("Before continuing, please give a path for the PDF to split.",
+                        'info', wx.OK|wx.ICON_INFORMATION)
 
 pdfs = wx.App(False)
 frame = PDFSplit(None)

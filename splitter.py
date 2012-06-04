@@ -163,14 +163,6 @@ class PDFSplit(wx.Frame):
             actuator.Show()
             actuator.process()
 
-    def get_splitter(self, num):
-        """
-        Returns the splitpanel for the splitter number given. Returns None if
-        an invalid number is given.
-        """
-        n = self.SPLITTER_START_POS + num
-        return self.shell_grid.GetItem(n).GetWindow()
-
 pdfs = wx.App(False)
 frame = PDFSplit(None)
 pdfs.MainLoop()

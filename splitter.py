@@ -9,7 +9,7 @@ from workerwindow import WorkerWindow
 
 class PDFSplit(wx.Frame):
 
-    VERSION = "1.0.4beta"
+    VERSION = "1.1beta"
     TITLE = "PDFSplit " + VERSION
     splitters = 0
     SPLITTER_START_POS = 2
@@ -116,6 +116,10 @@ class PDFSplit(wx.Frame):
     def OnAdd(self, event):
         win_size = self.GetSize()
         t = SplitPanel(self.panel, wx.ID_ANY)
+        if event:
+            max = len(self.shell_grid.GetChildren())
+            prev = self.shell_grid.GetItem(max - 2).GetWindow()
+            t.ent_path.SetValue(prev.ent_path.GetValue())
         self.shell_grid.Insert(len(self.shell_grid.Children) - 1, t,
             proportion=0, flag=wx.GROW)
         self.panel.Layout()
@@ -192,13 +196,13 @@ class PDFSplit(wx.Frame):
             os.mkdir(self.temp_path)
             os.chdir(self.temp_path)
             self.pdftk_path = os.path.join(self.app_path, "pdftk", "bin", "pdftk.exe")
-            try:
-                if not subprocess.check_call([self.pdftk_path, os.path.abspath(self.le_pdf.name), "burst"]):
-                    os.remove(os.path.join(self.temp_path, "doc_data.txt"))
-                    self.page_list = os.listdir(self.temp_path)
-                    self.page_count = len(self.page_list)
-            except Exception,e:
-                wx.MessageBox('error ' + str(e), 'error', wx.OK|wx.ICON_ERROR)
+            #try:
+            if not subprocess.check_call([self.pdftk_path, os.path.abspath(self.le_pdf.name), "burst"]):
+                os.remove(os.path.join(self.temp_path, "doc_data.txt"))
+                self.page_list = os.listdir(self.temp_path)
+                self.page_count = len(self.page_list)
+            #except Exception,e:
+                #wx.MessageBox('error ' + str(e), 'error', wx.OK|wx.ICON_ERROR)
 
     def OnSplit(self, event):
         if self.le_pdf:

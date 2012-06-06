@@ -185,7 +185,7 @@ class WorkerWindow(wx.Dialog):
             # Now we grab the splitpanel and start mining the info
             window = self.le_splitters[i-START]
             output_folder = os.path.join(window.ent_path.GetValue())
-            splits = str(window.ent_split_rules.GetValue()).replace(',','.').split('.')
+            splits = str(window.ent_split_rules.GetValue()).replace(',','.').strip('.').split('.')
 
             pdf = self.parent.le_pdf
 
@@ -199,10 +199,10 @@ class WorkerWindow(wx.Dialog):
                     if (int(resplit[0]) or int(split[1])) >= self.parent.page_count:
                         wx.MessageBox("Your range containtains a value larger than the number of pages in the PDF you are generating documents from.", 'error', wx.OK|wx.ICON_ERROR)
                         return False
-                    for i in range(int(resplit[0]), int(resplit[1]+1)):
+                    for i in range(int(resplit[0]), int(resplit[1])+1):
                         add = []
                         for f in self.parent.page_list:
-                            if i in f:
+                            if str(i) in f:
                                 add.append(f)
                         combine.append(sorted(add)[0])
                 else:
@@ -219,9 +219,9 @@ class WorkerWindow(wx.Dialog):
                 # us a PDF.
                 files = ""
                 cat = ""
-                for f in combine:
-                    files += chr(65+k) + "=\"" + os.path.abspath(f) + "\" "
-                    cat += chr(65+k) + " "
+                for key,f in enumerate(combine):
+                    files += chr(65+key) + "=\"" + os.path.abspath(f) + "\" "
+                    cat += chr(65+key) + " "
 
                 if not os.path.isdir(output_folder):
                     os.path.makedirs(output_folder)
@@ -230,7 +230,7 @@ class WorkerWindow(wx.Dialog):
                 file_name = prefix + str(k) + ".pdf"
                 combine_out_path = os.path.join(output_folder, file_name)
 
-                subprocess.check_call(str(self.parent.pdftk_path.replace("\\", "/") + " " + files.replace("\\","/") + " cat " + cat + " output " + combine_out_path.replace("\\","/")))
+                subprocess.check_call(str(self.parent.pdftk_path.replace("\\", "/") + " " + files.replace("\\","/") + " cat " + cat + " output \"" + combine_out_path.replace("\\","/") + "\""))
 
                 #except Exception,e:
                 #    print "Error: " + str(e)

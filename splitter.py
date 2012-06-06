@@ -1,7 +1,9 @@
 import os
-import wx
+import sys
+import subprocess
+import random
 
-from pyPdf import PdfFileReader
+import wx
 from splitpanel import SplitPanel
 from workerwindow import WorkerWindow
 
@@ -13,7 +15,14 @@ class PDFSplit(wx.Frame):
     SPLITTER_START_POS = 2
 
     def __init__(self, parent):
-        self.le_pdf = ""
+        # I need to know where I am...
+        if hasattr(sys, "frozen"):
+            self.app_path = os.path.dirname(os.path.abspath(sys.executable))
+        else:
+            self.app_path = os.path.dirname(os.path.abspath(__file__))
+
+        # le_pdf is the pdf to be split up
+        self.le_pdf = None
         self.frame = wx.Frame.__init__(self, parent,
             title=self.TITLE,
             size=(700,155),
@@ -64,6 +73,8 @@ class PDFSplit(wx.Frame):
         self.Show()
 
     def setup_accels(self):
+        # Give the user the ability to use ALT+A and ALT+D to add and remove
+        # splitter sections.
         self.accel_table = wx.AcceleratorTable([
             (wx.ACCEL_ALT, ord('A'), self.menuAdd.GetId()),
             (wx.ACCEL_ALT, ord('D'), self.menuRemove.GetId()),
@@ -142,16 +153,52 @@ class PDFSplit(wx.Frame):
 
     def OnBrowseInput(self, event):
         # Now present the user with a file dialog to chose the pdf to split
+
+        # Let the user know work is being done
+        self.ent_pdf_in.SetValue("Loading...")
+        self.ent_pdf_in.SetWindowStyleFlag(wx.TE_RIGHT)
+
+        # Presenting the dialog box
         dlg = wx.FileDialog(self, message="Open PDF", defaultDir="",
             defaultFile="", wildcard="PDF files (*.pdf)|*.pdf", style=wx.FD_OPEN)
+
+        # If OK, do a bunch of stuff
         if dlg.ShowModal() == wx.ID_OK:
-            self.ent_pdf_in.Clear()
             path = os.path.join(dlg.GetPath())
-            self.ent_pdf_in.AppendText(path)
-            self.le_pdf = PdfFileReader(file(path, "rb"))
-            self.le_pdf.getNumPages()
+            self.le_pdf = open(path, "r")
+            self.le_pdf.seek(0)
+
+            # If the document's magic number doesn't represent a PDF,
+            # we need to let the user know, but continue in case we are wrong
+            if self.le_pdf.read(4) <> "%PDF":
+                wx.MessageBox("Warning, document is not detected as Adobe PDF. Your mileage may vary.", 'info', wx.INFO|wx.ICON_INFO)
+
+            # Reset the textbox's settings and set it's value as the path
+            self.ent_pdf_in.SetDefaultStyle(self.ent_pdf_in.GetDefaultStyle())
+            self.ent_pdf_in.SetWindowStyleFlag(wx.TE_LEFT)
+            self.ent_pdf_in.SetValue(path)
             self.ent_pdf_in.SetBackgroundColour((192,255,203))
+
+            # Burst the PDF and get some info
+            self.burst()
         dlg.Destroy()
+
+    def burst(self):
+        if self.le_pdf:
+            self.pdf_path = os.path.abspath(self.le_pdf.name)
+            self.temp_num = random.randint(1000000,9999999)
+            self.temp_dir = "tmp%d" % self.temp_num
+            self.temp_path = os.path.join(self.app_path, self.temp_dir)
+            os.mkdir(self.temp_path)
+            os.chdir(self.temp_path)
+            self.pdftk_path = os.path.join(self.app_path, "pdftk", "bin", "pdftk.exe")
+            try:
+                if not subprocess.check_call([self.pdftk_path, os.path.abspath(self.le_pdf.name), "burst"]):
+                    os.remove(os.path.join(self.temp_path, "doc_data.txt"))
+                    self.page_list = os.listdir(self.temp_path)
+                    self.page_count = len(self.page_list)
+            except Exception,e:
+                wx.MessageBox('error ' + str(e), 'error', wx.OK|wx.ICON_ERROR)
 
     def OnSplit(self, event):
         if self.le_pdf:

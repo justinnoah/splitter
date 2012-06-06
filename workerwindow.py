@@ -1,7 +1,7 @@
 import os
+import subprocess
 
 import wx
-from pyPdf import PdfFileWriter, PdfFileReader
 
 # This class actually does the verification of splitting parameters and the
 # writing of the new PDF files.
@@ -76,7 +76,6 @@ class WorkerWindow(wx.Dialog):
         """
 
         # Begin by verifying input exists
-
         self.helper_color(self.hb_verify, 'Black')
         self.hb_verify.GetItem(0).GetWindow().SetLabel(">> ")
         self.panel.Layout()
@@ -190,21 +189,53 @@ class WorkerWindow(wx.Dialog):
 
             pdf = self.parent.le_pdf
 
-            for split in splits:
-                output = PdfFileWriter()
+            for k,split in enumerate(splits):
+                # Terrible, terrible hack, but I am tired and this should be in
+                # asap. This WILL be corrected, but deal with it for the time
+                # being.
+                combine = []
                 if '-' in split:
                     resplit = split.split('-')
-                    if (resplit[0] or split[1]) > pdf.getNumPages():
+                    if (int(resplit[0]) or int(split[1])) >= self.parent.page_count:
                         wx.MessageBox("Your range containtains a value larger than the number of pages in the PDF you are generating documents from.", 'error', wx.OK|wx.ICON_ERROR)
                         return False
-                    for i in range(resplit[0], resplit[1]+1):
-                        output.addPage(self.parent.le_pdf.getPage(i))
+                    for i in range(int(resplit[0]), int(resplit[1]+1)):
+                        add = []
+                        for f in self.parent.page_list:
+                            if i in f:
+                                add.append(f)
+                        combine.append(sorted(add)[0])
                 else:
-                    if pdf.getNumPages() > split:
-                        output.addPage(pdf.getPage(split+1))
-                out = file(str(os.path.join(output_folder, window.cmb_prefix.GetValue() + str(i - START + 1))) + ".pdf", "wb")
-                output.write(out)
-                out.close()
+                    print "SDLSDJLKFSDJ: " + str(int(split))
+                    if self.parent.page_count >= int(split):
+                        add = []
+                        for f in self.parent.page_list:
+                            if str(k) in f:
+                                add.append(f)
+                        combine.append(sorted(add)[0])
+                    else:
+                        return False
+                # File list to be combined has been created, let's create
+                # us a PDF.
+                files = ""
+                cat = ""
+                for f in combine:
+                    files += chr(65+k) + "=\"" + os.path.abspath(f) + "\" "
+                    cat += chr(65+k) + " "
+
+                if not os.path.isdir(output_folder):
+                    os.path.makedirs(output_folder)
+
+                prefix = os.path.join(window.cmb_prefix.GetValue())
+                file_name = prefix + str(k) + ".pdf"
+                combine_out_path = os.path.join(output_folder, file_name)
+
+                subprocess.check_call(str(self.parent.pdftk_path.replace("\\", "/") + " " + files.replace("\\","/") + " cat " + cat + " output " + combine_out_path.replace("\\","/")))
+
+                #except Exception,e:
+                #    print "Error: " + str(e)
+                #    wx.MessageBox("Error: " + str(e), 'error', wx.OK|wx.ICON_ERROR)
+
             self.helper_color(item_sizer, 'Gray')
             item_sizer.GetItem(0).GetWindow().SetLabel("")
 
@@ -213,6 +244,9 @@ class WorkerWindow(wx.Dialog):
     def helper_color(self, sizer, color):
         for child in sizer.GetChildren():
             child.GetWindow().SetForegroundColour(color)
+
+    def OnClean(self):
+        pass
 
     def OnClose(self, event):
         self.Destroy()

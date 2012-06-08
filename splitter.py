@@ -2,6 +2,7 @@ import os
 import sys
 import subprocess
 import random
+import shutil
 
 import wx
 from splitpanel import SplitPanel
@@ -9,10 +10,11 @@ from workerwindow import WorkerWindow
 
 class PDFSplit(wx.Frame):
 
-    VERSION = "1.1beta"
+    VERSION = "1.1.1 beta"
     TITLE = "PDFSplit " + VERSION
     splitters = 0
     SPLITTER_START_POS = 2
+    SPLITTER_END_POS = 3
 
     def __init__(self, parent):
         # I need to know where I am...
@@ -103,9 +105,12 @@ class PDFSplit(wx.Frame):
         pdf_box.Add(pdf_in, proportion=0, flag=wx.GROW)
         self.shell_grid.Add(pdf_box, proportion=0, flag=wx.GROW)
 
+        # Add some space before the split button
+        self.shell_grid.Add((0,10))
+
         # (Temporary) Button to initiate splitting.
-        self.btn_split = wx.Button(self.panel, label="Split", id=32)
-        self.shell_grid.Add(self.btn_split, proportion=0, flag=wx.GROW)
+        self.btn_split = wx.Button(self.panel, label="Split")
+        self.shell_grid.Add(self.btn_split, proportion=0, flag=wx.ALIGN_CENTER)
 
         # Give one
         self.OnAdd(None)
@@ -118,9 +123,9 @@ class PDFSplit(wx.Frame):
         t = SplitPanel(self.panel, wx.ID_ANY)
         if event:
             max = len(self.shell_grid.GetChildren())
-            prev = self.shell_grid.GetItem(max - 2).GetWindow()
+            prev = self.shell_grid.GetItem(max - self.SPLITTER_END_POS).GetWindow()
             t.ent_path.SetValue(prev.ent_path.GetValue())
-        self.shell_grid.Insert(len(self.shell_grid.Children) - 1, t,
+        self.shell_grid.Insert(len(self.shell_grid.Children) - 2, t,
             proportion=0, flag=wx.GROW)
         self.panel.Layout()
 
@@ -145,7 +150,7 @@ class PDFSplit(wx.Frame):
         # if we have more that one split section, destroy the last splitter
         if self.splitters > 1:
             self.splitters -= 1
-            children[len(children)-2].GetWindow().Destroy()
+            children[len(children)-self.SPLITTER_END_POS].GetWindow().Destroy()
             self.shell_grid.Layout()
             self.panel.Layout()
             self.SetSize((win_size.x, win_size.y - self.sHeight))
@@ -196,13 +201,10 @@ class PDFSplit(wx.Frame):
             os.mkdir(self.temp_path)
             os.chdir(self.temp_path)
             self.pdftk_path = os.path.join(self.app_path, "pdftk", "bin", "pdftk.exe")
-            #try:
             if not subprocess.check_call([self.pdftk_path, os.path.abspath(self.le_pdf.name), "burst"]):
                 os.remove(os.path.join(self.temp_path, "doc_data.txt"))
                 self.page_list = os.listdir(self.temp_path)
                 self.page_count = len(self.page_list)
-            #except Exception,e:
-                #wx.MessageBox('error ' + str(e), 'error', wx.OK|wx.ICON_ERROR)
 
     def OnSplit(self, event):
         if self.le_pdf:
@@ -212,6 +214,15 @@ class PDFSplit(wx.Frame):
         else:
             wx.MessageBox("Before continuing, please give a path for the PDF to split.",
                         'info', wx.OK|wx.ICON_INFORMATION)
+
+        # Once processed, clean up the temporary files
+        """
+        if self.tmp_dir:
+            shutil.rmtree(self.tmp_dir, True)
+            self.temp_num = None
+            self.temp_dir = None
+            self.temp_path = None
+        """
 
 pdfs = wx.App(False)
 frame = PDFSplit(None)

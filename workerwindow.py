@@ -121,7 +121,7 @@ class WorkerWindow(wx.Dialog):
         Generate a list of the splitpanels for ease of use
         """
         for k,v in enumerate(self.parent.shell_grid.GetChildren()):
-            if k >= self.parent.SPLITTER_START_POS and k < len(self.parent.shell_grid.GetChildren())-1:
+            if k >= self.parent.SPLITTER_START_POS and k < len(self.parent.shell_grid.GetChildren())-2:
                 window = v.GetWindow()
                 # Check for whites
                 if (window.ent_path.GetValue() == "" or
@@ -206,7 +206,6 @@ class WorkerWindow(wx.Dialog):
                                 add.append(f)
                         combine.append(sorted(add)[0])
                 else:
-                    print "SDLSDJLKFSDJ: " + str(int(split))
                     if self.parent.page_count >= int(split):
                         add = []
                         for f in self.parent.page_list:
@@ -230,14 +229,19 @@ class WorkerWindow(wx.Dialog):
                 file_name = prefix + str(k) + ".pdf"
                 combine_out_path = os.path.join(output_folder, file_name)
 
-                subprocess.check_call(str(self.parent.pdftk_path.replace("\\", "/") + " " + files.replace("\\","/") + " cat " + cat + " output \"" + combine_out_path.replace("\\","/") + "\""))
+                # Temporary workaround for not over writing existing files.
+                if os.path.exists(combine_out_path):
+                    wx.MessageBox("%s already exists. Please remove these files or choose a different directory before continuing." % combine_out_path, 'error', wx.OK|wx.ICON_ERROR)
+                    self.helper_color(item_sizer, 'Red')
+                    item_sizer.GetItem(0).GetWindow().SetLabel("")
+                    item_sizer.GetItem(2).GetWindow().SetLabel("FAILED!")
+                    return False
 
-                #except Exception,e:
-                #    print "Error: " + str(e)
-                #    wx.MessageBox("Error: " + str(e), 'error', wx.OK|wx.ICON_ERROR)
+                subprocess.check_call(str(self.parent.pdftk_path.replace("\\", "/") + " " + files.replace("\\","/") + " cat " + cat + " output \"" + combine_out_path.replace("\\","/") + "\""))
 
             self.helper_color(item_sizer, 'Gray')
             item_sizer.GetItem(0).GetWindow().SetLabel("")
+            item_sizer.GetItem(2).GetWindow().SetLabel("Success!")
 
         return True
 

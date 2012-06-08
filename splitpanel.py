@@ -13,7 +13,7 @@ class SplitPanel(wx.Panel):
 
         # category_row, split_entry
         self.outer = wx.BoxSizer(wx.VERTICAL)
-        self.outer.Add((0,10))
+        self.outer.Add((0,5))
         # Prefix (Combo box), Path_Entry, Path_Button
         self.category_row = wx.BoxSizer(wx.HORIZONTAL)
         # Split Rules - Label, TextCtrl
@@ -43,6 +43,8 @@ class SplitPanel(wx.Panel):
         self.rules_row.Add(self.btn_Clear, proportion=0)
 
         # Add items to outer
+        self.outer.Add(wx.StaticLine(self), proportion=1, flag=wx.GROW)
+        self.outer.Add((0,5))
         self.outer.Add(self.category_row, proportion=0, flag=wx.GROW)
         self.outer.Add(self.rules_row, proportion=0, flag=wx.GROW)
 

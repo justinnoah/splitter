@@ -111,7 +111,7 @@ class SplitPanel(wx.Panel):
             text_field.SetBackgroundColour(wx.NullColour)
         else:
             if result:
-                text_field.SetBackgroundColour((192,255,203))
+                text_field.SetBackgroundColour(wx.WHITE)
             elif not result:
                 text_field.SetBackgroundColour((255,192,203))
 
@@ -128,7 +128,7 @@ class SplitPanel(wx.Panel):
         if not text.GetValue():
             text.SetBackgroundColour(wx.NullColour)
         elif os.path.isdir(os.path.join(text.GetValue())):
-            text.SetBackgroundColour((192,255,203))
+            text.SetBackgroundColour(wx.WHITE)
         else:
             text.SetBackgroundColour((255,192,203))
         text.Refresh()

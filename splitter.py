@@ -186,7 +186,7 @@ class PDFSplit(wx.Frame):
             self.ent_pdf_in.SetDefaultStyle(self.ent_pdf_in.GetDefaultStyle())
             self.ent_pdf_in.SetWindowStyleFlag(wx.TE_LEFT)
             self.ent_pdf_in.SetValue(path)
-            self.ent_pdf_in.SetBackgroundColour((192,255,203))
+            self.ent_pdf_in.SetBackgroundColour(wx.WHITE)
 
             # Burst the PDF and get some info
             self.burst()

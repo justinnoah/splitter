@@ -163,7 +163,7 @@ class WorkerWindow(wx.Dialog):
                 wx.MessageBox(section.ent_path.GetValue() + " is not a valid path!", "Error", wx.OK|wx.ICON_ERROR)
                 return False
 
-            if not section.ent_split_rules.GetBackgroundColour() <> (255,192,203):
+            if section.ent_split_rules.GetBackgroundColour() == (255,192,203) or section.ent_split_rules.GetValue() == "":
                 wx.MessageBox("Your split rule \"" + section.ent_split_rules.GetValue() + "\" is not valid!", "Error", wx.OK|wx.ICON_ERROR)
                 return False
 

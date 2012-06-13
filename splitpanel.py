@@ -9,7 +9,9 @@ class SplitPanel(wx.Panel):
 
     def __init__(self, parent, id):
         # THIS NEEDS TO BE CLEANED!
-        wx.Panel.__init__(self, parent, id)
+        wx.Panel.__init__(self, parent.panel, id)
+        
+        self.parent = parent
 
         # category_row, split_entry
         self.outer = wx.BoxSizer(wx.VERTICAL)
@@ -36,13 +38,13 @@ class SplitPanel(wx.Panel):
         # Split Rules Row contents
         self.lbl_split = wx.StaticText(self, label="  Split Ranges: ")
         self.ent_split_rules = wx.TextCtrl(self)
-        self.btn_Clear = wx.Button(self, wx.ID_CLEAR)
+        self.btn_Remove = wx.Button(self, label="Remove")
 
         # Add items to rules_row
         self.rules_row.Add(self.lbl_split, proportion=0, flag=wx.ALIGN_CENTER_VERTICAL)
         self.rules_row.Add(self.ent_split_rules, proportion=5)
         self.rules_row.Add((10,0))
-        self.rules_row.Add(self.btn_Clear, proportion=0)
+        self.rules_row.Add(self.btn_Remove, proportion=0)
 
         # Add items to outer
         self.outer.Add(wx.StaticLine(self), proportion=1, flag=wx.GROW)
@@ -51,7 +53,7 @@ class SplitPanel(wx.Panel):
         self.outer.Add(self.rules_row, proportion=0, flag=wx.GROW)
 
         # Setup bindings
-        self.Bind(wx.EVT_BUTTON, self.OnClear, self.btn_Clear)
+        self.Bind(wx.EVT_BUTTON, self.parent.OnRemove, self.btn_Remove)
         self.Bind(wx.EVT_BUTTON, self.OnBrowse, self.btn_browse)
         self.Bind(wx.EVT_TEXT, self.ValidateRange, self.ent_split_rules)
         self.Bind(wx.EVT_TEXT, self.ValidatePath, self.ent_path)
@@ -59,16 +61,6 @@ class SplitPanel(wx.Panel):
         # Finish up
         self.SetSizer(self.outer)
         self.Show()
-
-    def OnClear(self, event):
-        # Reset background color to white and clear the text of
-        # the text fields.
-        self.ent_path.SetBackgroundColour(wx.NullColour)
-        self.ent_path.Clear()
-        self.ent_path.Refresh()
-        self.ent_split_rules.SetBackgroundColour(wx.NullColour)
-        self.ent_split_rules.Clear()
-        self.ent_split_rules.Refresh()
 
     def ValidateRange(self, event):
         text_field = event.GetEventObject()

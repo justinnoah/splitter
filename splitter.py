@@ -27,12 +27,12 @@ class PDFSplit(wx.Frame):
         self.le_pdf = None
         self.frame = wx.Frame.__init__(self, parent,
             title=self.TITLE,
-            size=(700,155),
+            size=(705,150),
             style=wx.MINIMIZE_BOX|wx.RESIZE_BORDER|wx.SYSTEM_MENU|wx.CAPTION|
                 wx.CLOSE_BOX|wx.CLIP_CHILDREN)
         self.panel = wx.Panel(self)
         self.shell_grid = wx.BoxSizer(wx.VERTICAL)
-        self.shell_grid.Add((10,10))
+        self.shell_grid.Add((0,5))
 
         # File Menu
         filemenu = wx.Menu()
@@ -121,7 +121,7 @@ class PDFSplit(wx.Frame):
 
     def OnAdd(self, event):
         win_size = self.GetSize()
-        t = SplitPanel(self.panel, wx.ID_ANY)
+        t = SplitPanel(self, wx.ID_ANY)
         if event:
             max = len(self.shell_grid.GetChildren())
             prev = self.shell_grid.GetItem(max - self.SPLITTER_END_POS).GetWindow()
@@ -143,15 +143,25 @@ class PDFSplit(wx.Frame):
     def OnRemove(self, event):
         # With Remove, we want to remove one of the splitter sections
         # and shrink the window height.
-
-        # Simplification
-        win_size = self.GetSize()
+        choice = False
         children = self.shell_grid.GetChildren()
 
-        # if we have more that one split section, destroy the last splitter
-        if self.splitters > 1:
-            self.splitters -= 1
-            children[len(children)-self.SPLITTER_END_POS].GetWindow().Destroy()
+        if event.GetEventType() == wx.wxEVT_COMMAND_BUTTON_CLICKED:
+            dlg = wx.MessageDialog(None, "Are you sure you want to remove this section?", 'Question', wx.YES_NO|wx.NO_DEFAULT)
+            if self.splitters > 1 and dlg.ShowModal() == wx.ID_YES:
+                choice = True
+                self.splitters -= 1
+                event.GetEventObject().GetParent().Destroy()
+        # 10014 is a menu clicked event type. Can't find the correct wx.wx???? event type that matches 10014
+        elif event.GetEventType() == 10014:
+            dlg = wx.MessageDialog(None, "Are you sure you want to remove the last section?", 'Question', wx.YES_NO|wx.NO_DEFAULT)
+            if self.splitters > 1 and dlg.ShowModal() == wx.ID_YES:
+                choice = True
+                self.splitters -= 1
+                children[len(children)-self.SPLITTER_END_POS].GetWindow().Destroy()
+
+        if choice:
+            win_size = self.GetSize()
             self.shell_grid.Layout()
             self.panel.Layout()
             self.SetSize((win_size.x, win_size.y - self.sHeight))

@@ -2,7 +2,7 @@ import os
 import sys
 import subprocess
 import random
-import shutil
+from shutil import rmtree
 
 import wx
 from splitpanel import SplitPanel
@@ -15,6 +15,7 @@ class PDFSplit(wx.Frame):
     splitters = 0
     SPLITTER_START_POS = 2
     SPLITTER_END_POS = 3
+    temp_paths = []
 
     def __init__(self, parent):
         # I need to know where I am...
@@ -65,6 +66,9 @@ class PDFSplit(wx.Frame):
         # Bind Button Events
         self.Bind(wx.EVT_BUTTON, self.OnBrowseInput, self.btn_pdf_in)
         self.Bind(wx.EVT_BUTTON, self.OnSplit, self.btn_split)
+
+        # Bind the close event
+        self.Bind(wx.EVT_CLOSE, self.OnExit)
 
         # Setup the accelerators
         self.setup_accels()
@@ -117,7 +121,11 @@ class PDFSplit(wx.Frame):
         self.OnAdd(None)
 
     def OnExit(self, event):
-        self.Close(True)
+        self.panel.GetTopLevelParent().Hide()
+        os.chdir(self.app_path)
+        for path in self.temp_paths:
+            rmtree(path)
+        self.Destroy()
 
     def OnAdd(self, event):
         win_size = self.GetSize()
@@ -204,18 +212,25 @@ class PDFSplit(wx.Frame):
         dlg.Destroy()
 
     def burst(self):
+        self.panel.Layout()
         if self.le_pdf:
             self.pdf_path = os.path.abspath(self.le_pdf.name)
-            self.temp_num = random.randint(1000000,9999999)
-            self.temp_dir = "tmp%d" % self.temp_num
-            self.temp_path = os.path.join(self.app_path, self.temp_dir)
-            os.mkdir(self.temp_path)
-            os.chdir(self.temp_path)
+            temp_num = random.randint(1000000,9999999)
+            temp_dir = "tmp%d" % temp_num
+            temp_path = os.path.join(self.app_path, temp_dir)
+            os.mkdir(temp_path)
+            os.chdir(temp_path)
             self.pdftk_path = os.path.join(self.app_path, "pdftk", "bin", "pdftk.exe")
-            if not subprocess.check_call([self.pdftk_path, os.path.abspath(self.le_pdf.name), "burst"]):
-                os.remove(os.path.join(self.temp_path, "doc_data.txt"))
-                self.page_list = os.listdir(self.temp_path)
-                self.page_count = len(self.page_list)
+            self.temp_paths.append(temp_path)
+            if os.path.exists(self.pdftk_path):
+                info = subprocess.STARTUPINFO()
+                info.dwFlags |= subprocess._subprocess.STARTF_USESHOWWINDOW
+                if not subprocess.check_call([self.pdftk_path, os.path.abspath(self.le_pdf.name), "burst"], startupinfo=info):
+                    os.remove(os.path.join(temp_path, "doc_data.txt"))
+                    self.page_list = os.listdir(temp_path)
+                    self.page_count = len(self.page_list)
+            else:
+                wx.MessageDialog("Unable to locate pdftk, please make sure it is in the same folder as splitter.exe", 'error', wx.OK|wx.ICON_ERROR)
 
     def OnSplit(self, event):
         if self.le_pdf:
@@ -225,15 +240,6 @@ class PDFSplit(wx.Frame):
         else:
             wx.MessageBox("Before continuing, please give a path for the PDF to split.",
                         'info', wx.OK|wx.ICON_INFORMATION)
-
-        # Once processed, clean up the temporary files
-        """
-        if self.tmp_dir:
-            shutil.rmtree(self.tmp_dir, True)
-            self.temp_num = None
-            self.temp_dir = None
-            self.temp_path = None
-        """
 
 pdfs = wx.App(False)
 frame = PDFSplit(None)

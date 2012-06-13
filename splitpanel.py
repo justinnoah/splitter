@@ -10,7 +10,7 @@ class SplitPanel(wx.Panel):
     def __init__(self, parent, id):
         # THIS NEEDS TO BE CLEANED!
         wx.Panel.__init__(self, parent.panel, id)
-        
+
         self.parent = parent
 
         # category_row, split_entry

@@ -29,8 +29,6 @@ class WorkerWindow(wx.Dialog):
         # Followed by setting up the UI
         self.parent = parent
         wx.Dialog.__init__(self, parent=wx.GetApp().TopWindow, id=wx.ID_ANY,
-            #style=wx.RESIZE_BORDER|wx.CAPTION|wx.CLIP_CHILDREN|
-            #wx.FRAME_NO_TASKBAR|wx.FRAME_FLOAT_ON_PARENT,
             size=(375,110),
             style=wx.DEFAULT_DIALOG_STYLE & ~wx.CLOSE_BOX,
         )
@@ -110,9 +108,6 @@ class WorkerWindow(wx.Dialog):
         # Temporary magic
         self.generate()
 
-        # Done
-        self.btn_close.Enable()
-
         # Redraw
         self.panel.Layout()
 
@@ -144,7 +139,6 @@ class WorkerWindow(wx.Dialog):
         # So this is getting really messy and needs to be reconstructed, but in the mean time, here's a random button.
         self.vbox.Add((0,10))
         self.btn_close = wx.Button(self.panel, label="Close")
-        self.btn_close.Disable()
         self.vbox.Add(self.btn_close, proportion=0, flag=wx.GROW)
         # Close button binding
         self.Bind(wx.EVT_BUTTON, self.OnClose, self.btn_close)
@@ -188,6 +182,8 @@ class WorkerWindow(wx.Dialog):
             splits = str(window.ent_split_rules.GetValue()).replace(',','.').strip('.').split('.')
 
             pdf = self.parent.le_pdf
+
+            self.panel.Layout()
 
             for k,split in enumerate(splits):
                 # Terrible, terrible hack, but I am tired and this should be in
@@ -237,11 +233,14 @@ class WorkerWindow(wx.Dialog):
                     item_sizer.GetItem(2).GetWindow().SetLabel("FAILED!")
                     return False
 
-                subprocess.check_call(str(self.parent.pdftk_path.replace("\\", "/") + " " + files.replace("\\","/") + " cat " + cat + " output \"" + combine_out_path.replace("\\","/") + "\""))
+                info = subprocess.STARTUPINFO()
+                info.dwFlags |= subprocess._subprocess.STARTF_USESHOWWINDOW
+                subprocess.check_call(str(self.parent.pdftk_path.replace("\\", "/") + " " + files.replace("\\","/") + " cat " + cat + " output \"" + combine_out_path.replace("\\","/") + "\""), startupinfo=info)
 
             self.helper_color(item_sizer, 'Gray')
             item_sizer.GetItem(0).GetWindow().SetLabel("")
             item_sizer.GetItem(2).GetWindow().SetLabel("Success!")
+            self.panel.Layout()
 
         return True
 
@@ -253,8 +252,13 @@ class WorkerWindow(wx.Dialog):
         pass
 
     def OnClose(self, event):
-        self.Destroy()
-        event.Skip()
+        dlg = wx.MessageDialog(None, "Do you wish to exit PDFSplit?", 'Question', wx.YES_NO|wx.wx.ICON_QUESTION)
+        if dlg.ShowModal() == wx.ID_YES:
+            self.Destroy()
+            self.parent.OnExit(None)
+        else:
+            self.Destroy()
+            event.Skip()
 
 if __name__ == '__main__':
     print "Not a standalone module"

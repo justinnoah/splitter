@@ -30,6 +30,7 @@ class SplitPanel(wx.Panel):
         self.category_row.Add(self.cmb_prefix, proportion=0)
         self.category_row.Add(self.out_text, proportion=0, flag=wx.ALIGN_CENTER_VERTICAL)
         self.category_row.Add(self.ent_path, proportion=5)
+        self.category_row.Add((10,0))
         self.category_row.Add(self.btn_browse, proportion=0)
 
         # Split Rules Row contents
@@ -40,6 +41,7 @@ class SplitPanel(wx.Panel):
         # Add items to rules_row
         self.rules_row.Add(self.lbl_split, proportion=0, flag=wx.ALIGN_CENTER_VERTICAL)
         self.rules_row.Add(self.ent_split_rules, proportion=5)
+        self.rules_row.Add((10,0))
         self.rules_row.Add(self.btn_Clear, proportion=0)
 
         # Add items to outer

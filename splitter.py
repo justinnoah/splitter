@@ -99,6 +99,7 @@ class PDFSplit(wx.Frame):
         self.btn_pdf_in = wx.Button(self.panel, label="Browse...")
         pdf_in.Add(lbl_pdf_in, proportion=0, flag=wx.ALIGN_CENTER_VERTICAL)
         pdf_in.Add(self.ent_pdf_in, proportion=1, flag=wx.GROW)
+        pdf_in.Add((10,0))
         pdf_in.Add(self.btn_pdf_in, proportion=0)
 
         # Putting the path details together.

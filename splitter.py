@@ -5,6 +5,9 @@ import random
 from shutil import rmtree
 
 import wx
+from twisted.internet import wxreactor, threads
+wxreactor.install()
+from twisted.internet import reactor
 from splitpanel import SplitPanel
 from workerwindow import WorkerWindow
 
@@ -201,15 +204,24 @@ class PDFSplit(wx.Frame):
             if self.le_pdf.read(4) <> "%PDF":
                 wx.MessageBox("Warning, document is not detected as Adobe PDF. Your mileage may vary.", 'info', wx.INFO|wx.ICON_INFO)
 
-            # Reset the textbox's settings and set it's value as the path
-            self.ent_pdf_in.SetDefaultStyle(self.ent_pdf_in.GetDefaultStyle())
-            self.ent_pdf_in.SetWindowStyleFlag(wx.TE_LEFT)
-            self.ent_pdf_in.SetValue(path)
-            self.ent_pdf_in.SetBackgroundColour(wx.WHITE)
-
             # Burst the PDF and get some info
-            self.burst()
+            d = threads.deferToThread(self.burst)
+            d.addCallback(self.bursted, path)
+            d.addErrback(self.failed_burst)
         dlg.Destroy()
+
+    def failed_burst(self, *args, **kwa):
+        self.ent_pdf_in.SetDefaultStyle(self.ent_pdf_in.GetDefaultStyle())
+        self.ent_pdf_in.SetWindowStyleFlag(wx.TE_LEFT)
+        self.ent_pdf_in.SetValue("There was an error loading the PDF you selected.")
+        self.ent_pdf_in.SetBackgroundColour((255,192,203))
+
+    def bursted(self, d, path):
+        # Reset the textbox's settings and set it's value as the path
+        self.ent_pdf_in.SetDefaultStyle(self.ent_pdf_in.GetDefaultStyle())
+        self.ent_pdf_in.SetWindowStyleFlag(wx.TE_LEFT)
+        self.ent_pdf_in.SetValue(path)
+        self.ent_pdf_in.SetBackgroundColour(wx.WHITE)
 
     def burst(self):
         self.panel.Layout()
@@ -230,7 +242,7 @@ class PDFSplit(wx.Frame):
                     self.page_list = os.listdir(temp_path)
                     self.page_count = len(self.page_list)
             else:
-                wx.MessageDialog("Unable to locate pdftk, please make sure it is in the same folder as splitter.exe", 'error', wx.OK|wx.ICON_ERROR)
+                wx.MessageDialo("Unable to locate pdftk, please make sure it is in the same folder as splitter.exe", 'error', wx.OK|wx.ICON_ERROR)
 
     def OnSplit(self, event):
         if self.le_pdf:
@@ -241,6 +253,9 @@ class PDFSplit(wx.Frame):
             wx.MessageBox("Before continuing, please give a path for the PDF to split.",
                         'info', wx.OK|wx.ICON_INFORMATION)
 
+
 pdfs = wx.App(False)
 frame = PDFSplit(None)
-pdfs.MainLoop()
+reactor.registerWxApp(pdfs)
+#pdfs.MainLoop()
+reactor.run()

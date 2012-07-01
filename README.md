@@ -6,6 +6,7 @@ A simple wxpython front end to [pdftk](http://www.pdflabs.com/tools/pdftk-the-pd
 Dependencies
 ============
 * wxPython
+* twisted
 * pdftk (currently must be in the same folder as splitter.py[1])
 
 

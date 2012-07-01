@@ -1,7 +1,7 @@
 splitter
 ========
 
-splitter is the code name for this simple program titled PDFSplit. PDFSplit is a very minimalistic GUI wrapper for pdftk. Currently it only cats sections and only allows a small bit of the pdftk grammar. This application is desined with one specific goal in mind; easily splitting large PDF combined reports.
+A simple wxpython front end to [pdftk](http://www.pdflabs.com/tools/pdftk-the-pdf-toolkit/) intended to simplify the splitting of large PDF documents.
 
 Dependencies
 ============

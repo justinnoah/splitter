@@ -242,7 +242,7 @@ class PDFSplit(wx.Frame):
                     self.page_list = os.listdir(temp_path)
                     self.page_count = len(self.page_list)
             else:
-                wx.MessageDialo("Unable to locate pdftk, please make sure it is in the same folder as splitter.exe", 'error', wx.OK|wx.ICON_ERROR)
+                wx.MessageDialog("Unable to locate pdftk, please make sure it is in the same folder as splitter.exe", 'error', wx.OK|wx.ICON_ERROR)
 
     def OnSplit(self, event):
         if self.le_pdf:
@@ -257,5 +257,4 @@ class PDFSplit(wx.Frame):
 pdfs = wx.App(False)
 frame = PDFSplit(None)
 reactor.registerWxApp(pdfs)
-#pdfs.MainLoop()
 reactor.run()

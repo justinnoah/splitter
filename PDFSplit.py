@@ -225,8 +225,7 @@ class PDFSplit(wx.Frame):
             # we need to let the user know, but continue in case we are wrong
             if self.le_pdf.read(4) <> "%PDF":
                 wx.MessageBox(
-                    "Warning, document is not detected as Adobe PDF." +
-                    "The following may not work as expected.",
+                    "Document is not detected as Adobe PDF.",
                     'info', wx.INFO|wx.ICON_INFO
                 )
 
@@ -273,8 +272,7 @@ class PDFSplit(wx.Frame):
                     self.page_count = len(self.page_list)
             else:
                 wx.MessageDialog(
-                    "Unable to locate pdftk, please make sure it is in the " +
-                    "same folder as splitter.exe",
+                    "Unable to locate pdftk. PDFSplit may be corrupted.",
                     'error', wx.OK|wx.ICON_ERROR
                 )
 
@@ -285,7 +283,7 @@ class PDFSplit(wx.Frame):
             worker.process()
         else:
             wx.MessageBox(
-                "Before continuing, please give a path for the PDF to split.",
+                "Before continuing, please give the path of a PDF to split.",
                 'info', wx.OK|wx.ICON_INFORMATION
             )
 

@@ -20,7 +20,7 @@ def Datafiles(*filenames, **kw):
 
 pdftk = Datafiles('bin/pdftk.exe', 'bin/libiconv2.dll', strip_path=False)
 
-a = Analysis(['splitter.py'],
+a = Analysis(['PDFSplit.py'],
              pathex=['c:\\Documents and Settings\\IEUser\\projects\\splitter'],
              hiddenimports=[],
              hookspath=None,
@@ -37,7 +37,7 @@ exe = EXE(pyz,
           a.zipfiles,
           a.datas,
           pdftk,
-          name='splitter.exe',
+          name='PDFSplit.exe',
           debug=False,
           strip=None,
           upx=True,

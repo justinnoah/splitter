@@ -13,7 +13,7 @@ from workerwindow import WorkerWindow
 
 class PDFSplit(wx.Frame):
 
-    VERSION = "1.3"
+    VERSION = "0.7"
     TITLE = "PDFSplit " + VERSION
     splitters = 0
     SPLITTER_START_POS = 2

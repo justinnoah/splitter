@@ -218,6 +218,7 @@ class PDFSplit(wx.Frame):
 
         # Let the user know work is being done
         self.ent_pdf_in.SetValue("Loading...")
+        self.ent_pdf_in.SetBackgroundColour(wx.WHITE)
         self.ent_pdf_in.SetWindowStyleFlag(wx.TE_RIGHT)
 
         # Presenting the dialog box
@@ -257,7 +258,7 @@ class PDFSplit(wx.Frame):
         self.ent_pdf_in.SetDefaultStyle(self.ent_pdf_in.GetDefaultStyle())
         self.ent_pdf_in.SetWindowStyleFlag(wx.TE_LEFT)
         self.ent_pdf_in.SetValue(path)
-        self.ent_pdf_in.SetBackgroundColour(wx.WHITE)
+        self.ent_pdf_in.SetBackgroundColour((192,255,203))
 
     def burst(self):
         self.panel.Layout()

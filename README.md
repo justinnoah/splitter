@@ -5,9 +5,6 @@ A simple wxpython front end to [pdftk](http://www.pdflabs.com/tools/pdftk-the-pd
 
 Dependencies
 ============
-* wxPython
-* twisted
-* pdftk (currently must be in the same folder as splitter.py[1])
-
-
-[1] PDFSplit is being designed to be self contained sitting somewhere on a Windows network.
+* wxPython - tested with 2.8.12.1
+* twisted  - tested with 12.1.0
+* pdftk    - must be located at $SPLITTERPATH/bin/pdftk

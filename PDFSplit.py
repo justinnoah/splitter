@@ -3,6 +3,7 @@ import sys
 import subprocess
 import random
 from shutil import rmtree
+from tempfile import mkdtemp
 
 import wx
 from twisted.internet import wxreactor, threads
@@ -254,10 +255,7 @@ class PDFSplit(wx.Frame):
         self.panel.Layout()
         if self.le_pdf:
             self.pdf_path = os.path.abspath(self.le_pdf.name)
-            temp_num = random.randint(1000000,9999999)
-            temp_dir = "tmp%d" % temp_num
-            temp_path = os.path.join(self.app_path, temp_dir)
-            os.mkdir(temp_path)
+            temp_path = mkdtemp()
             os.chdir(temp_path)
             self.pdftk_path = os.path.join(
                 self.extract_path, "bin", "pdftk.exe"

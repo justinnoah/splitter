@@ -21,6 +21,7 @@ class PDFSplit(wx.Frame):
     temp_paths = []
 
     def __init__(self, parent):
+        self.page_count = 0
         # I need to know where I am...
         if hasattr(sys, "frozen"):
             self.app_path = os.path.dirname(os.path.abspath(sys.executable))
@@ -40,11 +41,17 @@ class PDFSplit(wx.Frame):
 
         # File Menu
         filemenu = wx.Menu()
-        self.menuAdd = filemenu.Append(id=wx.ID_ANY, text="&Add Section\tALT-A")
-        self.menuRemove = filemenu.Append(id=wx.ID_ANY, text="&Remove Section\tALT-D")
+        self.menuAdd = filemenu.Append(
+            id=wx.ID_ANY, text="&Add Section\tALT-A"
+        )
+        self.menuRemove = filemenu.Append(
+            id=wx.ID_ANY, text="&Remove Section\tALT-D"
+        )
         self.menuRemove.Enable(False)
         filemenu.AppendSeparator()
-        menuExit = filemenu.Append(wx.ID_EXIT, "E&xit\tALT-F4", "Close " + self.TITLE)
+        menuExit = filemenu.Append(
+            wx.ID_EXIT, "E&xit\tALT-F4", "Close " + self.TITLE
+        )
 
         # Help Menu
         helpmenu = wx.Menu()
@@ -137,8 +144,9 @@ class PDFSplit(wx.Frame):
             max = len(self.shell_grid.GetChildren())
             prev = self.shell_grid.GetItem(max - self.SPLITTER_END_POS).GetWindow()
             t.ent_path.SetValue(prev.ent_path.GetValue())
-        self.shell_grid.Insert(len(self.shell_grid.Children) - 2, t,
-            proportion=0, flag=wx.GROW)
+        self.shell_grid.Insert(
+            len(self.shell_grid.Children) - 2, t, proportion=0, flag=wx.GROW
+        )
         self.panel.Layout()
 
         # +1 the splitters
@@ -158,14 +166,25 @@ class PDFSplit(wx.Frame):
         children = self.shell_grid.GetChildren()
 
         if event.GetEventType() == wx.wxEVT_COMMAND_BUTTON_CLICKED:
-            dlg = wx.MessageDialog(None, "Are you sure you want to remove this section?", 'Question', wx.YES_NO|wx.NO_DEFAULT)
+            dlg = wx.MessageDialog(
+                None,
+                "Are you sure you want to remove this section?",
+                'Question',
+                wx.YES_NO|wx.NO_DEFAULT
+            )
             if self.splitters > 1 and dlg.ShowModal() == wx.ID_YES:
                 choice = True
                 self.splitters -= 1
                 event.GetEventObject().GetParent().Destroy()
-        # 10014 is a menu clicked event type. Can't find the correct wx.wx???? event type that matches 10014
+        # 10014 is a menu clicked event type. Can't find the correct wx.wx????
+        # event type that matches 10014
         elif event.GetEventType() == 10014:
-            dlg = wx.MessageDialog(None, "Are you sure you want to remove the last section?", 'Question', wx.YES_NO|wx.NO_DEFAULT)
+            dlg = wx.MessageDialog(
+                None,
+                "Are you sure you want to remove the last section?",
+                'Question',
+                wx.YES_NO|wx.NO_DEFAULT
+            )
             if self.splitters > 1 and dlg.ShowModal() == wx.ID_YES:
                 choice = True
                 self.splitters -= 1
@@ -202,7 +221,11 @@ class PDFSplit(wx.Frame):
             # If the document's magic number doesn't represent a PDF,
             # we need to let the user know, but continue in case we are wrong
             if self.le_pdf.read(4) <> "%PDF":
-                wx.MessageBox("Warning, document is not detected as Adobe PDF. Your mileage may vary.", 'info', wx.INFO|wx.ICON_INFO)
+                wx.MessageBox(
+                    "Warning, document is not detected as Adobe PDF." +
+                    "The following may not work as expected.",
+                    'info', wx.INFO|wx.ICON_INFO
+                )
 
             # Burst the PDF and get some info
             d = threads.deferToThread(self.burst)
@@ -213,7 +236,9 @@ class PDFSplit(wx.Frame):
     def failed_burst(self, *args, **kwa):
         self.ent_pdf_in.SetDefaultStyle(self.ent_pdf_in.GetDefaultStyle())
         self.ent_pdf_in.SetWindowStyleFlag(wx.TE_LEFT)
-        self.ent_pdf_in.SetValue("There was an error loading the PDF you selected.")
+        self.ent_pdf_in.SetValue(
+            "There was an error loading the PDF you selected."
+        )
         self.ent_pdf_in.SetBackgroundColour((255,192,203))
 
     def bursted(self, d, path):
@@ -232,17 +257,26 @@ class PDFSplit(wx.Frame):
             temp_path = os.path.join(self.app_path, temp_dir)
             os.mkdir(temp_path)
             os.chdir(temp_path)
-            self.pdftk_path = os.path.join(self.app_path, "pdftk", "bin", "pdftk.exe")
+            self.pdftk_path = os.path.join(
+                self.app_path, "bin", "pdftk.exe"
+            )
             self.temp_paths.append(temp_path)
             if os.path.exists(self.pdftk_path):
                 info = subprocess.STARTUPINFO()
                 info.dwFlags |= subprocess._subprocess.STARTF_USESHOWWINDOW
-                if not subprocess.check_call([self.pdftk_path, os.path.abspath(self.le_pdf.name), "burst"], startupinfo=info):
+                call = [
+                    self.pdftk_path, os.path.abspath(self.le_pdf.name), "burst"
+                ]
+                if not subprocess.check_call(call, startupinfo=info):
                     os.remove(os.path.join(temp_path, "doc_data.txt"))
                     self.page_list = os.listdir(temp_path)
                     self.page_count = len(self.page_list)
             else:
-                wx.MessageDialog("Unable to locate pdftk, please make sure it is in the same folder as splitter.exe", 'error', wx.OK|wx.ICON_ERROR)
+                wx.MessageDialog(
+                    "Unable to locate pdftk, please make sure it is in the " +
+                    "same folder as splitter.exe",
+                    'error', wx.OK|wx.ICON_ERROR
+                )
 
     def OnSplit(self, event):
         if self.le_pdf:
@@ -250,8 +284,10 @@ class PDFSplit(wx.Frame):
             worker.Show()
             worker.process()
         else:
-            wx.MessageBox("Before continuing, please give a path for the PDF to split.",
-                        'info', wx.OK|wx.ICON_INFORMATION)
+            wx.MessageBox(
+                "Before continuing, please give a path for the PDF to split.",
+                'info', wx.OK|wx.ICON_INFORMATION
+            )
 
 
 pdfs = wx.App(False)

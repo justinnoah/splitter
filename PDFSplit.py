@@ -23,6 +23,7 @@ class PDFSplit(wx.Frame):
 
     def __init__(self, parent):
         self.page_count = 0
+
         # I need to know where I am...
         if hasattr(sys, "frozen"):
             self.app_path = os.path.dirname(os.path.abspath(sys.executable))
@@ -33,11 +34,14 @@ class PDFSplit(wx.Frame):
 
         # le_pdf is the pdf to be split up
         self.le_pdf = None
-        self.frame = wx.Frame.__init__(self, parent,
+        self.frame = wx.Frame.__init__(
+            self, parent,
             title=self.TITLE,
             size=(705,150),
             style=wx.MINIMIZE_BOX|wx.RESIZE_BORDER|wx.SYSTEM_MENU|wx.CAPTION|
-                wx.CLOSE_BOX|wx.CLIP_CHILDREN)
+                wx.CLOSE_BOX|wx.CLIP_CHILDREN
+        )
+
         self.panel = wx.Panel(self)
         self.shell_grid = wx.BoxSizer(wx.VERTICAL)
         self.shell_grid.Add((0,5))
@@ -136,17 +140,21 @@ class PDFSplit(wx.Frame):
     def OnExit(self, event):
         self.panel.GetTopLevelParent().Hide()
         os.chdir(self.app_path)
+
         for path in self.temp_paths:
             rmtree(path)
+
         self.Destroy()
 
     def OnAdd(self, event):
         win_size = self.GetSize()
         t = SplitPanel(self, wx.ID_ANY)
+
         if event:
             max = len(self.shell_grid.GetChildren())
             prev = self.shell_grid.GetItem(max - self.SPLITTER_END_POS).GetWindow()
             t.ent_path.SetValue(prev.ent_path.GetValue())
+
         self.shell_grid.Insert(
             len(self.shell_grid.Children) - 2, t, proportion=0, flag=wx.GROW
         )
@@ -179,6 +187,7 @@ class PDFSplit(wx.Frame):
                 choice = True
                 self.splitters -= 1
                 event.GetEventObject().GetParent().Destroy()
+
         # 10014 is a menu clicked event type. Can't find the correct wx.wx????
         # event type that matches 10014
         elif event.GetEventType() == 10014:

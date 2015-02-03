@@ -132,14 +132,16 @@ class SplitPanel(wx.Panel):
 
     def OnBrowse(self, event):
         # Openning the PDF for manipulation
-        dlg = wx.DirDialog(self, message=self.cmb_prefix.GetValue() + " Output Folder", defaultPath=self.ent_path.GetValue())
+        dlg = wx.DirDialog(
+            self,
+            message=self.cmb_prefix.GetValue() + " Output Folder",
+            defaultPath=self.ent_path.GetValue()
+        )
+
         if dlg.ShowModal() == wx.ID_OK:
             self.ent_path.Clear()
             path = os.path.join(dlg.GetPath())
             self.ent_path.AppendText(path)
+
         dlg.Destroy()
         event.Skip()
-
-if __name__ == '__main__':
-    print "Not a standalone module"
-    exit(0)

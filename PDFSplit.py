@@ -25,8 +25,10 @@ class PDFSplit(wx.Frame):
         # I need to know where I am...
         if hasattr(sys, "frozen"):
             self.app_path = os.path.dirname(os.path.abspath(sys.executable))
+            self.extract_path = sys._MEIPASS
         else:
             self.app_path = os.path.dirname(os.path.abspath(__file__))
+            self.extract_path = self.app_path
 
         # le_pdf is the pdf to be split up
         self.le_pdf = None
@@ -258,7 +260,7 @@ class PDFSplit(wx.Frame):
             os.mkdir(temp_path)
             os.chdir(temp_path)
             self.pdftk_path = os.path.join(
-                self.app_path, "bin", "pdftk.exe"
+                self.extract_path, "bin", "pdftk.exe"
             )
             self.temp_paths.append(temp_path)
             if os.path.exists(self.pdftk_path):

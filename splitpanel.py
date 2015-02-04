@@ -107,7 +107,7 @@ class SplitPanel(wx.Panel):
             text_field.SetBackgroundColour(wx.NullColour)
         else:
             if result:
-                text_field.SetBackgroundColour((192,255,203))
+                text_field.SetBackgroundColour(wx.WHITE)
             elif not result:
                 text_field.SetBackgroundColour((255,192,203))
 
